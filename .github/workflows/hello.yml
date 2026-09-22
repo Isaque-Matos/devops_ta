@@ -21,4 +21,4 @@ jobs:
       - name: Executando dois ou mais comandos
         run: |
           ls -l
-          echo "Fim do PROCESSO".
+          echo "Fim do PROCESSO"
