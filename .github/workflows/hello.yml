@@ -5,6 +5,12 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    
+# regras do github page
+permissions:
+   contents: read
+   pages: write
+   id-token: write
 
 jobs:
   Compilar:
@@ -22,3 +28,24 @@ jobs:
         run: |
           ls -l
           echo "Fim do PROCESSO"
+
+  # Single deploy job since we're just deploying
+  Deploy:
+    needs: Compilar
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
