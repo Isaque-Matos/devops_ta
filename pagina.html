@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISM — Streaming</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #08090c;
+      --text: #fff;
+      --muted: #b9bac0;
+      --accent: #e5093f;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 4%;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,.85),
+        rgba(0,0,0,0)
+      );
+    }
+
+    .logo {
+      color: var(--accent);
+      font-size: 29px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      margin-right: 40px;
+    }
+
+    nav {
+      display: flex;
+      gap: 23px;
+    }
+
+    nav a {
+      color: #ddd;
+      text-decoration: none;
+      font-size: 14px;
+      transition: .2s;
+    }
+
+    nav a:hover {
+      color: white;
+    }
+
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .search {
+      width: 190px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,.45);
+      background: rgba(0,0,0,.55);
+      color: white;
+      padding: 0 12px;
+      outline: none;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #ff6a00, #ee0979);
+    }
+
+    /* HERO */
+    .hero {
+      height: 78vh;
+      min-height: 570px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 100px 5% 50px;
+      background:
+        linear-gradient(90deg, #08090c 0%, rgba(8,9,12,.9) 25%, rgba(8,9,12,.25) 65%, rgba(8,9,12,.9) 100%),
+        linear-gradient(0deg, #08090c 0%, transparent 25%),
+        url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=2000&q=85")
+        center/cover;
+    }
+
+    .hero-content {
+      max-width: 610px;
+    }
+
+    .tag {
+      color: #ddd;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin-bottom: 15px;
+    }
+
+    .hero h1 {
+      font-size: clamp(48px, 7vw, 90px);
+      line-height: .9;
+      letter-spacing: -4px;
+      margin-bottom: 24px;
+    }
+
+    .hero-description {
+      color: #ddd;
+      font-size: 17px;
+      line-height: 1.55;
+      max-width: 560px;
+      margin-bottom: 27px;
+    }
+
+    .meta {
+      display: flex;
+      gap: 14px;
+      color: #ddd;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 13px 25px;
+      font-size: 15px;
+      font-weight: bold;
+      transition: .2s;
+    }
+
+    .watch {
+      background: white;
+      color: #111;
+    }
+
+    .watch:hover {
+      background: #ddd;
+      transform: scale(1.03);
+    }
+
+    .info {
+      background: rgba(80,80,80,.7);
+      color: white;
+    }
+
+    .info:hover {
+      background: rgba(100,100,100,.85);
+    }
+
+    /* CONTENT */
+    main {
+      position: relative;
+      margin-top: -70px;
+      z-index: 3;
+      padding-bottom: 60px;
+    }
+
+    .section {
+      margin-bottom: 38px;
+    }
+
+    .section h2 {
+      padding: 0 4%;
+      font-size: 21px;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 4px 4%;
+      scrollbar-width: none;
+    }
+
+    .row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .card {
+      flex: 0 0 190px;
+      height: 270px;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+      background: #15161b;
+      cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.08);
+      z-index: 5;
+      box-shadow: 0 15px 35px rgba(0,0,0,.6);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 45% 0 0;
+      background: linear-gradient(transparent, rgba(0,0,0,.9));
+    }
+
+    .card-title {
+      position: absolute;
+      z-index: 2;
+      bottom: 13px;
+      left: 12px;
+      right: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    /* FOOTER */
+    footer {
+      color: #777;
+      padding: 50px 5%;
+      border-top: 1px solid #1b1c20;
+      font-size: 13px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 700px) {
+      header {
+        height: 60px;
+        padding: 0 20px;
+      }
+
+      .logo {
+        margin-right: 0;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .search {
+        width: 120px;
+      }
+
+      .hero {
+        min-height: 620px;
+        height: 75vh;
+        padding: 90px 25px 50px;
+      }
+
+      .hero h1 {
+        font-size: 54px;
+      }
+
+      .hero-description {
+        font-size: 15px;
+      }
+
+      .card {
+        flex-basis: 145px;
+        height: 210px;
+      }
+
+      .section h2 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">ISM</div>
+
+    <nav>
+      <a href="#">Início</a>
+      <a href="#">Filmes</a>
+      <a href="#">Séries</a>
+      <a href="#">Minha lista</a>
+    </nav>
+
+    <div class="header-right">
+      <input class="search" type="text" placeholder="Buscar..." />
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="tag">VISTA ORIGINAL</div>
+
+      <h1>NOITE<br>ETERNA</h1>
+
+      <div class="meta">
+        <span>2026</span>
+        <span>16+</span>
+        <span>2h 08min</span>
+        <span>Suspense</span>
+      </div>
+
+      <p class="hero-description">
+        Quando uma cidade inteira perde a eletricidade durante uma noite
+        aparentemente interminável, uma jovem jornalista descobre que o
+        apagão pode esconder algo muito maior.
+      </p>
+
+      <div class="buttons">
+        <button class="watch" onclick="playMovie()">▶ Assistir</button>
+        <button class="info" onclick="showInfo()">ⓘ Mais informações</button>
+      </div>
+    </div>
+  </section>
+
+  <main>
+
+    <section class="section">
+      <h2>Em alta agora</h2>
+
+      <div class="row">
+        <div class="card"><img src="https://images.unsplash.com/photo-1518709594023-6eab9bab7b23?auto=format&fit=crop&w=500&q=80"><div class="card-title">Horizonte</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=500&q=80"><div class="card-title">Última Cena</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=500&q=80"><div class="card-title">Destino</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=500&q=80"><div class="card-title">Além do Mar</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=500&q=80"><div class="card-title">Frequência</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=500&q=80"><div class="card-title">O Enigma</div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Porque você assistiu a Noite Eterna</h2>
+
+      <div class="row">
+        <div class="card"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=500&q=80"><div class="card-title">Sombras</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1485095329183-d0797cdc5676?auto=format&fit=crop&w=500&q=80"><div class="card-title">O Silêncio</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1533928298208-27ff66555d8d?auto=format&fit=crop&w=500&q=80"><div class="card-title">Cidade Zero</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=500&q=80"><div class="card-title">Eco</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=500&q=80"><div class="card-title">Depois</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=500&q=80"><div class="card-title">Pulso</div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Filmes de ação</h2>
+
+      <div class="row">
+        <div class="card"><img src="https://images.unsplash.com/photo-1540224871915-bc8ffb782bdf?auto=format&fit=crop&w=500&q=80"><div class="card-title">Impacto</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1487180144351-b8472da7d491?auto=format&fit=crop&w=500&q=80"><div class="card-title">Velocidade</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=500&q=80"><div class="card-title">Tempestade</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=500&q=80"><div class="card-title">Operação</div></div>
+        <div class="card"><img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=500&q=80"><div class="card-title">Ritmo</div></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 ISM Company — Uma experiência fictícia de streaming.
+  </footer>
+
+  <script>
+    function playMovie() {
+      alert("▶ Reproduzindo: Noite Eterna");
+    }
+
+    function showInfo() {
+      alert(
+        "NOITE ETERNA\\n\\n" +
+        "Um suspense original sobre uma cidade mergulhada em um apagão misterioso."
+      );
+    }
+
+    const search = document.querySelector(".search");
+
+    search.addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+
+      document.querySelectorAll(".card").forEach(card => {
+        const title = card
+          .querySelector(".card-title")
+          .textContent
+          .toLowerCase();
+
+        card.style.display =
+          !query || title.includes(query)
+            ? "block"
+            : "none";
+      });
+    });
+  </script>
+
+</body>
+</html>
